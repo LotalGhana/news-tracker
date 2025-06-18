@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - NewsTracker</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome to Your Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<form id="articleForm">
+  <input type="text" id="title" placeholder="Article Title" required />
+  <input type="text" id="platform" placeholder="Platform" required />
+  <input type="date" id="date" required />
+  <input type="number" id="earnings" placeholder="Earnings ($)" required />
+  <button type="submit">Add Article</button>
+</form>
+
+<div class="summary">
+  <p><strong>Total Articles:</strong> <span id="totalArticles">0</span></p>
+  <p><strong>Total Earnings:</strong> $<span id="totalEarnings">0</span></p>
+</div>
+
+<table id="articlesTable">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Platform</th>
+      <th>Date</th>
+      <th>Earnings ($)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+  </div>
+
+  <script>
+  const userIdRef = { uid: null };
+
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      userIdRef.uid = user.uid;
+      loadArticles(); // fetch user articles from Firestore
+    }
+  });
+
+  function logout() {
+    firebase.auth().signOut().then(() => {
+      window.location.href = "index.html";
+    });
+  }
+
+  const form = document.getElementById('articleForm');
+  const tableBody = document.querySelector('#articlesTable tbody');
+  const totalArticles = document.getElementById('totalArticles');
+  const totalEarnings = document.getElementById('totalEarnings');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const platform = document.getElementById('platform').value;
+    const date = document.getElementById('date').value;
+    const earnings = parseFloat(document.getElementById('earnings').value);
+
+    await db.collection('users').doc(userIdRef.uid).collection('articles').add({
+      title, platform, date, earnings
+    });
+
+    form.reset();
+    loadArticles();
+  });
+
+  async function loadArticles() {
+    const snapshot = await db.collection('users').doc(userIdRef.uid).collection('articles').get();
+    let total = 0;
+    tableBody.innerHTML = '';
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      total += data.earnings;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${data.title}</td>
+        <td>${data.platform}</td>
+        <td>${data.date}</td>
+        <td>${data.earnings.toFixed(2)}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    totalArticles.textContent = snapshot.size;
+    totalEarnings.textContent = total.toFixed(2);
+  }
+</script>
+
+</body>
+</html>
