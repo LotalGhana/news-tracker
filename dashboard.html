@@ -18,18 +18,14 @@
 <button onclick="logout()">Logout</button>
 
 <form id="articleForm">
-  <input type="text" id="title" placeholder="Article Title" required>
-<input type="text" id="platform" placeholder="Platform" required>
-<input type="date" id="date" required>
-<button type="submit">Add Article</button>
+  <input type="text" id="title" placeholder="Title" required>
+  <input type="text" id="platform" placeholder="Platform" required>
+  <input type="date" id="date" required>
+  <button type="submit">Add Article</button>
 </form>
 
-<div class="summary">
-  <p><strong>Total Articles:</strong> <span id="totalArticles">0</span></p>
-  <p style="text-align:center; font-size:14px; color:#666;">
-  Earnings per article are fixed at <strong>$0.015</strong>.
-</p>
-</div>
+<p>Total Articles: <span id="totalArticles">0</span></p>
+<p>Total Earnings: $<span id="totalEarnings">0</span></p>
 
 <table id="articlesTable">
   <thead>
@@ -37,7 +33,8 @@
       <th>Title</th>
       <th>Platform</th>
       <th>Date</th>
-      <th>Earnings ($)</th>
+      <th>Earnings</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody></tbody>
