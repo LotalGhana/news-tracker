@@ -102,6 +102,18 @@
 
     totalArticles.textContent = snapshot.size;
     totalEarnings.textContent = total.toFixed(2);
+
+    // Add delete functionality to each button
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      const id = e.target.getAttribute('data-id');
+
+      await db.collection('users').doc(userIdRef.uid)
+              .collection('articles').doc(id).delete();
+
+      loadArticles(); // refresh table after deletion
+    });
+  });
   }
 </script>
 
