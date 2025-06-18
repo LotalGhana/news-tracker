@@ -20,6 +20,7 @@
 
 <form id="articleForm">
   <input type="text" id="title" placeholder="Title" required>
+  <input type="url" id="source" placeholder="Source URL (e.g. https://example.com)" required>
   <input type="text" id="platform" placeholder="Platform" required>
   <input type="date" id="date" required>
   <button type="submit">Add Article</button>
@@ -32,6 +33,7 @@
   <thead>
     <tr>
       <th>Title</th>
+      <th>Source</th>
       <th>Platform</th>
       <th>Date</th>
       <th>Earnings</th>
@@ -69,12 +71,13 @@
   form.addEventListener('submit', async function (e) {
   e.preventDefault();
   const title = document.getElementById('title').value;
+  const source = document.getElementById('source').value;
   const platform = document.getElementById('platform').value;
   const date = document.getElementById('date').value;
   const earnings = 0.015; // fixed value
 
   await db.collection('users').doc(userIdRef.uid).collection('articles').add({
-    title, platform, date, earnings
+    title, source, platform, date, earnings
   });
 
   form.reset();
@@ -94,6 +97,7 @@
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${data.title}</td>
+      <td><a href="${data.source}" target="_blank">View</a></td>
       <td>${data.platform}</td>
       <td>${data.date}</td>
       <td>$${data.earnings.toFixed(3)}</td>
