@@ -81,40 +81,40 @@
   loadArticles();
 });
 
-  async function loadArticles() {
-    const snapshot = await db.collection('users').doc(userIdRef.uid).collection('articles').get();
-    let total = 0;
-    tableBody.innerHTML = '';
+ async function loadArticles() {
+  const snapshot = await db.collection('users').doc(userIdRef.uid).collection('articles').get();
+  let total = 0;
+  tableBody.innerHTML = '';
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      total += data.earnings;
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const docId = doc.id; // This is required
+    total += data.earnings;
 
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${data.title}</td>
-        <td>${data.platform}</td>
-        <td>${data.date}</td>
-        <td>${data.earnings.toFixed(2)}</td>
-      `;
-      tableBody.appendChild(row);
-    });
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${data.title}</td>
+      <td>${data.platform}</td>
+      <td>${data.date}</td>
+      <td>$${data.earnings.toFixed(3)}</td>
+      <td><button class="delete-btn" data-id="${docId}">Delete</button></td>
+    `;
+    tableBody.appendChild(row);
+  });
 
-    totalArticles.textContent = snapshot.size;
-    totalEarnings.textContent = total.toFixed(2);
+  totalArticles.textContent = snapshot.size;
+  totalEarnings.textContent = total.toFixed(2);
 
-    // Add delete functionality to each button
+  // Add delete button logic
   document.querySelectorAll('.delete-btn').forEach(button => {
     button.addEventListener('click', async (e) => {
       const id = e.target.getAttribute('data-id');
-
-      await db.collection('users').doc(userIdRef.uid)
-              .collection('articles').doc(id).delete();
-
-      loadArticles(); // refresh table after deletion
+      await db.collection('users').doc(userIdRef.uid).collection('articles').doc(id).delete();
+      loadArticles();
     });
   });
-  }
+}
+    
 </script>
 
 </body>
